@@ -46,27 +46,6 @@ $id_fiscal_atual = $fiscal_atual['id_fiscal'] ?? '';
     <title>Editar Aluno</title>
     <link rel="stylesheet" href="../css/editar_aluno.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <style>
-        #message {
-            padding: 12px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            display: none;
-            font-weight: 500;
-        }
-        
-        #message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        #message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-    </style>
 </head>
 
 <body>
@@ -89,7 +68,7 @@ $id_fiscal_atual = $fiscal_atual['id_fiscal'] ?? '';
             
             <!-- Adicionar campo de Status -->
             Status:
-            <select name="status" required>
+            <select name="status" class="selectStatus" required>
                 <option value="ativo" <?= ($aluno['status'] == 'ativo') ? 'selected' : '' ?>>Ativo</option>
                 <option value="inativo" <?= ($aluno['status'] == 'inativo') ? 'selected' : '' ?>>Inativo</option>SS
             </select><br>
