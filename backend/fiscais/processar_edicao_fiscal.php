@@ -1,7 +1,6 @@
 <?php
 session_start();
-require '../../backend/sistemas/config.php';
-
+require '../sistemas/config.php';
 // Obtém os dados do fiscal da requisição POST
 $id = $_POST['id'] ?? null;
 $nome = $_POST['nome'] ?? null;
@@ -15,17 +14,21 @@ if ($id) {
     $update_sql = "UPDATE fiscais SET nome=?, cnh=?, nome_carro=?, placa=?, destino=? WHERE id=?";
     $update_stmt = $conn->prepare($update_sql);
     $update_stmt->bind_param("sssssi", $nome, $cnh, $nome_carro, $placa, $destino, $id);
-
+    
     if ($update_stmt->execute()) {
         $_SESSION['message'] = "Fiscal atualizado com sucesso!";
+        // Redireciona de volta para a página de edição do fiscal
+        header("Location: ../../frontend/fiscais/editar_fiscal.php?id=" . $id);
+        exit;
     } else {
         $_SESSION['error'] = "Erro ao atualizar fiscal.";
+        header("Location: ../../frontend/fiscais/editar_fiscal.php?id=" . $id);
+        exit;
     }
 } else {
-    $_SESSION['error'] = "ID do fiscal não fornecido.";
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'ID não fornecido.'
+    ]);
 }
-
-// Redireciona de volta para a página de fiscais
-header("Location: http://localhost/sistema_dashboard/frontend/fiscais/fiscais.php");
-exit;
 ?>

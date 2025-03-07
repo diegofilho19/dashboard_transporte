@@ -7,6 +7,7 @@ $sql = "SELECT
     a.nome_completo,
     f.nome AS nome_faculdade,  -- Nome da faculdade
     a.cpf,
+    a.numero_tel,
     a.matricula,
     f.cidade,  -- Cidade da faculdade
     a.data_insercao,
@@ -116,7 +117,8 @@ function formatarData($data)
                     echo "<td>" . $motorista_info . ", " . $carro_info . "</td>";
 
                     echo "<td>
-                        <button onclick='abrirModal(\"" . $row["nome_completo"] . "\", \"" . $row["cpf"] . "\", \"" . $row["matricula"] . "\", \"" . $row["status"] . "\", \"" . $row["nome_faculdade"] . "\", \"" . $row["cidade"] . "\", \"" . $row["foto"] . "\", \"" . $row['nome_motorista'] . "\", \"" . $row['nome_carro'] . "\", \"" . $row['placa'] . "\")' class='visualizar btn-cinza'>Visualizar</button>
+                        <button onclick='abrirModal(\"" . $row["nome_completo"] . "\", \"" . $row["cpf"] . "\", \"" . $row['numero_tel'] . "\", \"" . $row["matricula"] . "\", \"" . $row["status"] . "\", \"" . $row["nome_faculdade"] . 
+                        "\", \"" . $row["cidade"] . "\", \"" . $row["foto"] . "\", \"" . $row['nome_motorista'] . "\", \"" . $row['nome_carro'] . "\", \"" . $row['placa'] . "\")' class='visualizar btn-cinza'>Visualizar</button>
                         <a href='../alunos/editar_alunos.php?cpf=" . $row["cpf"] . "' class='edit-button'>Editar</a>
                         <form method='post' action='../../backend/alunos/processar_exclusao_aluno.php' style='display:inline;' class='excluir-aluno-form'>
                             <input type='hidden' name='cpf' value='" . $row["cpf"] . "'>
@@ -143,6 +145,7 @@ function formatarData($data)
             <div class="info-aluno">
                 <p id="nomeCarteira">Nome: </p>
                 <p id="cpfCarteira">CPF: </p>
+                <p id="numeroCarteira">Número: </p>
                 <p id="matriculaCarteira">Matrícula: </p>
                 <p id="faculdadeCarteira">Faculdade: </p>
                 <p id="cidadeCarteira">Cidade: </p>
@@ -154,9 +157,10 @@ function formatarData($data)
     </div>
 
     <script>
-        function abrirModal(nome, cpf, matricula, status, faculdade, cidade, foto, motorista, carro, placa) {
+        function abrirModal(nome, cpf, numero_tel, matricula, status, faculdade, cidade, foto, motorista, carro, placa) {
             document.getElementById("nomeCarteira").textContent = "Nome: " + nome;
             document.getElementById("cpfCarteira").textContent = "CPF: " + cpf;
+            document.getElementById("numeroCarteira").textContent = "Número: " + numero_tel;
             document.getElementById("matriculaCarteira").textContent = "Matrícula: " + matricula;
             document.getElementById("statusCarteira").textContent = "Status: " + status;
             document.getElementById("faculdadeCarteira").textContent = "Faculdade: " + faculdade;
