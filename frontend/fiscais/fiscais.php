@@ -13,10 +13,10 @@ $result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 
 <head>
-    <title>Dashboard - Fiscais</title>
+    <title>Dashboard - Motoristas</title>
     <link rel="stylesheet" href="../css/fiscais.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
@@ -34,8 +34,13 @@ $result = $conn->query($sql);
         </div></a>
 
         <div class="menu-item">
-            <a href="http://localhost/sistema_dashboard/frontend/fiscais/fiscais.php"><span>📋</span>
-                <span>Fiscais</span>
+            <a href="http://localhost/sistema_dashboard/frontend/faculdades/faculdades.php"><span>🏫</span>
+                <span>Faculdades</span></a>
+        </div>
+
+        <div class="menu-item">
+            <a href="http://localhost/sistema_dashboard/frontend/fiscais/fiscais.php" style="display: flex; align-items: center; text-decoration: none;" ><span><img style="display: flex; justify-content: center; align-items: center;" width="20" height="20" src="https://img.icons8.com/color/48/driver.png" alt="driver"/></span>
+                <span style="padding-left: 5px;" > Motoristas</span>
         </div></a>
 
         <div class="menu-item" onclick="logout()">
@@ -46,7 +51,7 @@ $result = $conn->query($sql);
 
     <body class="main-content">
         <div class="header">
-            <h1>FISCAIS CADASTRADOS</h1>
+            <h1>MOTORISTAS CADASTRADOS</h1>
             <div class="controls">
                 <input type="text" class="search-bar" placeholder="Search...">
                 <select class="ordenar-select" aria-label="Ordenar fiscais">
@@ -59,7 +64,7 @@ $result = $conn->query($sql);
         </div>
 
         <div class="criar-fiscal">
-            <a href="cadastrar_fiscal.php">Criar Novo Fiscal</a>
+            <a href="cadastrar_fiscal.php">Cadastrar novo Motorista</a>
         </div>
 
         <table id="fiscaisTable">

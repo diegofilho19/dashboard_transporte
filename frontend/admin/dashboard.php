@@ -60,9 +60,15 @@ function formatarData($data)
             <span>Alunos</span></a>
     </div>
     <div class="menu-item">
-        <a href="http://localhost/sistema_dashboard/frontend/fiscais/fiscais.php"><span>📋</span>
-            <span>Fiscais</span></a>
+        <a href="http://localhost/sistema_dashboard/frontend/faculdades/faculdades.php"><span>🏫</span>
+            <span>Faculdades</span></a>
     </div>
+
+    <div class="menu-item">
+        <a href="http://localhost/sistema_dashboard/frontend/fiscais/fiscais.php" style="display: flex; align-items: center; text-decoration: none;"><span><img style="display: flex; justify-content: center; align-items: center;" width="20" height="20" src="https://img.icons8.com/color/48/driver.png" alt="driver" /></span>
+            <span style="padding-left: 5px;"> Motoristas</span>
+    </div></a>
+
     <div class="menu-item" onclick="logout()">
         <span>🚪</span>
         <span>Sair</span>
@@ -73,12 +79,19 @@ function formatarData($data)
     <div class="header">
         <h1>ALUNOS CADASTRADOS</h1>
         <div class="controls">
-            <input type="text" class="search-bar" placeholder="Search...">
+            <input type="text" class="search-bar" placeholder="Pesquisar...">
             <select class="ordenar-select" aria-label="Ordenar alunos">
-                <option>Mais recentes</option>
-                <option>Mais antigos</option>
-                <option>A-Z</option>
-                <option>Z-A</option>
+                <option value="#">Filtrar</option>
+                <option value="mais-recentes">Mais recentes</option>
+                <option value="mais-antigos">Mais antigos</option>
+                <option value="a-z">A-Z</option>
+                <option value="z-a">Z-A</option>
+            </select>
+            <select class="selectPag" aria-label="Registros por página">
+                <option value="5">5 registros</option>
+                <option value="10">10 registros</option>
+                <option value="20">20 registros</option>
+                <option value="50">50 registros</option>
             </select>
         </div>
     </div>
@@ -86,14 +99,14 @@ function formatarData($data)
     <table id="alunosTable">
         <thead>
             <tr>
-                <th onclick="ordenarPor('nome')">Nome do Aluno</th>
-                <th onclick="ordenarPor('faculdade')">Faculdade</th>
-                <th onclick="ordenarPor('cpf')">CPF</th>
-                <th onclick="ordenarPor('matricula')">Matrícula</th>
-                <th onclick="ordenarPor('cidade')">Cidade (Faculdade)</th>
-                <th onclick="ordenarPor('data')">Data de Inserção</th>
-                <th onclick="ordenarPor('status')">Status</th>
-                <th onclick="ordenarPor('motorista')">Motorista</th> <!-- Novo cabeçalho para Motorista -->
+                <th onclick="sortTable('nome')">Nome do Aluno</th>
+                <th onclick="sortTable('faculdade')">Faculdade</th>
+                <th onclick="sortTable('cpf')">CPF</th>
+                <th onclick="sortTable('matricula')">Matrícula</th>
+                <th onclick="sortTable('cidade')">Cidade (Faculdade)</th>
+                <th onclick="sortTable('data')">Data de Inserção</th>
+                <th onclick="sortTable('status')">Status</th>
+                <th onclick="sortTable('motorista')">Motorista</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -117,14 +130,16 @@ function formatarData($data)
                     echo "<td>" . $motorista_info . ", " . $carro_info . "</td>";
 
                     echo "<td>
-                        <button onclick='abrirModal(\"" . $row["nome_completo"] . "\", \"" . $row["cpf"] . "\", \"" . $row['numero_tel'] . "\", \"" . $row["matricula"] . "\", \"" . $row["status"] . "\", \"" . $row["nome_faculdade"] . 
+                    <div class='acoes-container'>
+                    <button onclick='abrirModal(\"" . $row["nome_completo"] . "\", \"" . $row["cpf"] . "\", \"" . $row['numero_tel'] . "\", \"" . $row["matricula"] . "\", \"" . $row["status"] . "\", \"" . $row["nome_faculdade"] .
                         "\", \"" . $row["cidade"] . "\", \"" . $row["foto"] . "\", \"" . $row['nome_motorista'] . "\", \"" . $row['nome_carro'] . "\", \"" . $row['placa'] . "\")' class='visualizar btn-cinza'>Visualizar</button>
-                        <a href='../alunos/editar_alunos.php?cpf=" . $row["cpf"] . "' class='edit-button'>Editar</a>
-                        <form method='post' action='../../backend/alunos/processar_exclusao_aluno.php' style='display:inline;' class='excluir-aluno-form'>
-                            <input type='hidden' name='cpf' value='" . $row["cpf"] . "'>
-                            <button type='button' class='btn-excluir' onclick='excluirAluno(\"" . $row["cpf"] . "\")'>Excluir</button>
+                    <a href='../alunos/editar_alunos.php?cpf=" . $row["cpf"] . "' class='edit-button'>Editar</a>
+                    <form method='post' action='../../backend/alunos/processar_exclusao_aluno.php' class='excluir-aluno-form'>
+                    <input type='hidden' name='cpf' value='" . $row["cpf"] . "'>
+                    <button type='button' class='btn-excluir' onclick='excluirAluno(\"" . $row["cpf"] . "\")'>Excluir</button>
                         </form>
-                    </td>";
+                    </div>
+                </td>";
 
                     echo "</tr>";
                 }
@@ -156,7 +171,217 @@ function formatarData($data)
         </div>
     </div>
 
+    <div id="pagination"></div>
+
     <script>
+        // Configuração da paginação e ordenação
+        let currentPage = 1;
+        let rowsPerPage = 5;
+        let tableData = [];
+        let currentSort = {
+            column: '',
+            ascending: true
+        };
+        
+        // Função para inicializar a tabela
+        function initializeTable() {
+            const table = document.getElementById('alunosTable');
+            const rows = Array.from(table.getElementsByTagName('tr')).slice(1); // Ignora o cabeçalho
+            tableData = rows.map(row => ({
+                element: row,
+                nome: row.cells[0].textContent.toLowerCase(),
+                faculdade: row.cells[1].textContent.toLowerCase(),
+                cpf: row.cells[2].textContent.toLowerCase(),
+                matricula: row.cells[3].textContent.toLowerCase(),
+                cidade: row.cells[4].textContent.toLowerCase(),
+                data: row.cells[5].textContent.toLowerCase(),
+                status: row.cells[6].textContent.toLowerCase(),
+                motorista: row.cells[7].textContent.toLowerCase()
+            }));
+            
+            updateTable();
+        }
+
+        // Função de ordenação melhorada
+        function sortTable(column) {
+            let sortedData = [...tableData];
+            
+            // Se clicar na mesma coluna, inverte a ordem
+            if (currentSort.column === column) {
+                currentSort.ascending = !currentSort.ascending;
+            } else {
+                currentSort.column = column;
+                currentSort.ascending = true;
+            }
+            
+            sortedData.sort((a, b) => {
+                let comparison = 0;
+                
+                switch(column) {
+                    case 'data':
+                        // Converte datas no formato dd/mm/yyyy para comparação
+                        const dateA = a.data.split('/').reverse().join('-');
+                        const dateB = b.data.split('/').reverse().join('-');
+                        comparison = new Date(dateA) - new Date(dateB);
+                        break;
+                    default:
+                        comparison = a[column].localeCompare(b[column]);
+                }
+                
+                return currentSort.ascending ? comparison : -comparison;
+            });
+            
+            currentPage = 1;
+            tableData = sortedData;
+            updateTable();
+        }
+
+        // Função para ordenar pelo select
+        function handleSelectSort(value) {
+            if (value === '#') return;
+            
+            switch(value) {
+                case 'a-z':
+                    sortTable('nome');
+                    break;
+                case 'z-a':
+                    sortTable('nome');
+                    currentSort.ascending = false;
+                    break;
+                case 'mais-recentes':
+                    sortTable('data');
+                    currentSort.ascending = false;
+                    break;
+                case 'mais-antigos':
+                    sortTable('data');
+                    currentSort.ascending = true;
+                    break;
+            }
+            
+            updateTable();
+        }
+
+        // Função para atualizar a exibição da tabela
+        function updateTable(filteredData = tableData) {
+            const table = document.getElementById('alunosTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            
+            // Limpa a tabela
+            tbody.innerHTML = '';
+            
+            // Calcula o início e fim dos dados para a página atual
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginatedData = filteredData.slice(start, end);
+            
+            if (paginatedData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9">Nenhum aluno encontrado.</td></tr>';
+            } else {
+                // Adiciona as linhas filtradas e paginadas
+                paginatedData.forEach(item => {
+                    tbody.appendChild(item.element.cloneNode(true));
+                });
+            }
+            
+            // Atualiza a paginação
+            updatePagination(totalPages, filteredData);
+        }
+
+        // SOLUÇÃO ATUALIZADA: Reescrita completa da função de paginação
+        function updatePagination(totalPages, filteredData) {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = ''; // Limpa o container
+            
+            if (totalPages <= 1) {
+                return; // Não mostra paginação se tiver apenas uma página
+            }
+            
+            // Adiciona botão "Anterior"
+            const prevButton = document.createElement('button');
+            prevButton.innerHTML = '&lt;';
+            prevButton.disabled = currentPage === 1;
+            if (!prevButton.disabled) {
+                prevButton.onclick = function() {
+                    currentPage--;
+                    updateTable(filteredData);
+                };
+            }
+            paginationContainer.appendChild(prevButton);
+            
+            // Adiciona botões com números das páginas
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.className = currentPage === i ? 'active' : '';
+                pageButton.onclick = function() {
+                    currentPage = i;
+                    updateTable(filteredData);
+                };
+                paginationContainer.appendChild(pageButton);
+            }
+            
+            // Adiciona botão "Próximo"
+            const nextButton = document.createElement('button');
+            nextButton.innerHTML = '&gt;';
+            nextButton.disabled = currentPage === totalPages;
+            if (!nextButton.disabled) {
+                nextButton.onclick = function() {
+                    currentPage++;
+                    updateTable(filteredData);
+                };
+            }
+            paginationContainer.appendChild(nextButton);
+        }
+
+        // Função para mudar de página - simplificada, agora lida diretamente pelos botões
+        function changePage(page) {
+            currentPage = page;
+            const searchTerm = document.querySelector('.search-bar').value.toLowerCase();
+            const filteredData = searchTable(searchTerm);
+            updateTable(filteredData);
+        }
+
+        // Função de pesquisa
+        function searchTable(searchTerm = '') {
+            if (!searchTerm) {
+                searchTerm = document.querySelector('.search-bar').value.toLowerCase();
+            }
+            
+            const filteredData = tableData.filter(item => 
+                item.nome.includes(searchTerm) ||
+                item.faculdade.includes(searchTerm) ||
+                item.cpf.includes(searchTerm) ||
+                item.matricula.includes(searchTerm) ||
+                item.cidade.includes(searchTerm) ||
+                item.data.includes(searchTerm) ||
+                item.status.includes(searchTerm) ||
+                item.motorista.includes(searchTerm)
+            );
+            
+            currentPage = 1;
+            updateTable(filteredData);
+            return filteredData;
+        }
+
+        // Função para mudar o número de registros por página
+        function changeRowsPerPage(value) {
+            rowsPerPage = parseInt(value);
+            currentPage = 1;
+            const searchTerm = document.querySelector('.search-bar').value.toLowerCase();
+            const filteredData = searchTable(searchTerm);
+            updateTable(filteredData);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTable();
+            
+            document.querySelector('.search-bar').addEventListener('input', () => searchTable());
+            document.querySelector('.ordenar-select').addEventListener('change', (e) => handleSelectSort(e.target.value));
+            document.querySelector('.selectPag').addEventListener('change', (e) => changeRowsPerPage(e.target.value));
+        });
+
         function abrirModal(nome, cpf, numero_tel, matricula, status, faculdade, cidade, foto, motorista, carro, placa) {
             document.getElementById("nomeCarteira").textContent = "Nome: " + nome;
             document.getElementById("cpfCarteira").textContent = "CPF: " + cpf;

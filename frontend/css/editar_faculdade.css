@@ -1,0 +1,108 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    background-color: #003366;
+    color: white;
+    width: 400px; /* Adjust width as needed */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 50px auto; /* Center the container */
+}
+
+h2 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input[type="text"] {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+}
+
+input[type="submit"], .cancel-button {
+    background-color: #00509e; /* Button color */
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+input[type="submit"]:hover, .cancel-button:hover {
+    background-color: #003366; /* Darker shade on hover */
+}
+
+.cancel-button {
+    background-color: #cc0000; /* Cancel button color */
+    text-align: center;
+    display: inline-block;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.container {
+    background-color: #003366;
+    color: white;
+    width: 400px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 50px auto;
+}
+
+/* Remova ou comente a propriedade display: none do #message */
+#message {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 90%; /* Largura máxima em telas pequenas */
+        padding: 15px; /* Ajusta o padding */
+    }
+
+    h2 {
+        font-size: 20px; /* Tamanho da fonte menor */
+    }
+}
+
+@media (max-width: 480px) {
+    input[type="text"] {
+        padding: 8px; /* Reduzir o padding dos inputs */
+    }
+
+    input[type="submit"], .cancel-button {
+        padding: 8px; /* Reduzir o padding dos botões */
+    }
+}
+
+#tipo{
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

@@ -39,7 +39,7 @@ body {
     background-color: #d0d0d0;
 }
 
-.menu-item a{
+.menu-item a {
     text-decoration: none;
     color: #000;
 }
@@ -75,7 +75,7 @@ table {
     background-color: white;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
@@ -158,13 +158,13 @@ table th:hover {
     border-radius: 4px;
 }
 
-.nome-aluno {
+.nome-fiscal {
     color: #2563eb;
     cursor: pointer;
     text-decoration: none;
 }
 
-.nome-aluno:hover {
+.nome-fiscal:hover {
     text-decoration: underline;
 }
 
@@ -182,7 +182,7 @@ table th:hover {
     align-items: center;
 }
 
-.carteira-estudante {
+.carteira-fiscal {
     background: #f3f4f6;
     padding: 20px;
     border-radius: 8px;
@@ -201,28 +201,12 @@ table th:hover {
     color: #374151;
 }
 
-.foto-perfil {
-    width: 200px;
-    height: 200px;
-    background: #e5e7eb;
-    border-radius: 50%;
-    margin: 0 auto 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    img {
-        border-radius: 50%;
-    }
-}
-
-
-.info-aluno {
+.info-fiscal {
     text-align: center;
     margin-bottom: 20px;
 }
 
-.info-aluno p {
+.info-fiscal p {
     margin: 8px 0;
     color: #374151;
 }
@@ -235,43 +219,14 @@ table th:hover {
     margin-bottom: 20px;
 }
 
-.status-ativo {
-    color: green;
-    font-weight: bold;
-}
-
-.status-inativo {
-    color: red;
-    font-weight: bold;
-}
-
-.modal-backdrop.show {
-display: flex;
-justify-items: center;
-align-items: center;
-position: relative;
-}
-
-.carteira-estudante {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    position: relative;
-    width: 90%;
-    max-width: 500px;
-}
-
 .btn-cinza, .edit-button, .btn-excluir {
-    min-width: 80px; /* Largura mínima para todos os botões */
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-size: 14px;
-    text-align: center;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    
+    padding: 5px 10px; /* Adiciona um pouco de preenchimento consistente */
+    border-radius: 5px; /* Bordas arredondadas consistentes */
+    cursor: pointer; /* Muda o cursor para indicar que é clicável */
+    transition: background-color 0.3s; /* Transição suave para a cor de fundo */
+    font-size: 14px; /* Tamanho da fonte consistente */
+    display: inline-block; /* Para garantir que o botão se comporte como um bloco */
+    text-align: center; /* Centraliza o texto */
 }
 
 /* Estilos específicos para cada botão */
@@ -306,35 +261,29 @@ position: relative;
     background-color: darkred; /* Cor de fundo ao passar o mouse */
 }
 
-.excluir-aluno-form {
-    margin: 0;
-    padding: 0;
-    display: inline-block;
-    min-width: 80px; /* Mesma largura mínima dos outros botões */
-}
-
-#alunosTable td:last-child {
-    text-align: center;
-    white-space: nowrap; /* Evita que os botões quebrem linha */
-}
-
+/* Estilos para a paginação */
 #pagination {
     margin-top: 20px;
     text-align: center;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
 }
 
 #pagination button {
     padding: 5px 10px;
-    margin: 0 5px;
     border: 1px solid #ddd;
     background-color: white;
     cursor: pointer;
     border-radius: 3px;
+    min-width: 30px;
 }
 
 #pagination button:disabled {
     background-color: #f5f5f5;
+    color: #aaa;
     cursor: not-allowed;
 }
 
@@ -342,10 +291,16 @@ position: relative;
     background-color: #007bff;
     color: white;
     border-color: #007bff;
+    font-weight: bold;
 }
 
-#pagination button:hover:not(:disabled) {
+#pagination button:hover:not(:disabled):not(.active) {
     background-color: #e9ecef;
+    border-color: #007bff;
+}
+
+#pagination span {
+    margin: 0 5px;
 }
 
 .controls {
@@ -356,47 +311,16 @@ position: relative;
 }
 
 .search-bar {
-    padding: 5px 10px;
+    padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
     min-width: 200px;
+    flex-grow: 1;
 }
 
 .ordenar-select, .selectPag {
-    padding: 5px 10px;
+    padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
     cursor: pointer;
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        width: 100%; /* Sidebar ocupa toda a largura */
-        height: auto; /* Altura automática */
-    }
-
-    .main-content {
-        margin-left: 0; /* Remove a margem da esquerda */
-        padding: 10px; /* Ajusta o padding */
-    }
-
-    .header {
-        flex-direction: column; /* Coloca os itens em coluna */
-        align-items: flex-start; /* Alinha à esquerda */
-    }
-
-    .search-bar {
-        width: 100%; /* Aumenta a largura da barra de pesquisa */
-    }
-}
-
-@media (max-width: 480px) {
-    table {
-        font-size: 12px; /* Tamanho da fonte menor para tabelas */
-    }
-
-    .btn-cinza, .edit-button, .btn-excluir {
-        padding: 5px; /* Reduzir o padding dos botões */
-        font-size: 12px; /* Tamanho da fonte menor */
-    }
 }
