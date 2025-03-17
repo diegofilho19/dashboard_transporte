@@ -74,8 +74,8 @@ if ($id) {
             Placa: <input type="text" name="placa" value="<?= htmlspecialchars($fiscal['placa']) ?>" required><br>
             Destino: <input type="text" name="destino" value="<?= htmlspecialchars($fiscal['destino']) ?>" required><br>
             <input type="hidden" name="id" value="<?= htmlspecialchars($fiscal['id']) ?>">
-            <input type="submit" value="Salvar">
-            <a href="fiscais.php" class="cancel-button">Cancelar</a>
+            <input type="submit" value="SALVAR">
+            <a href="fiscais.php" class="cancel-button">CANCELAR</a>
         </form>
     </div>
 

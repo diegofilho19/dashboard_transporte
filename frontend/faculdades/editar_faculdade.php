@@ -98,7 +98,7 @@ if ($id) {
                     success: function(response) {
                         if (response.status === "success") {
                             const messageElement = document.getElementById("message");
-                            messageElement.innerHTML = "faculdades editado com sucesso!";
+                            messageElement.innerHTML = "Faculdade editada com sucesso!";
                             messageElement.className = "success-message";
                             messageElement.style.display = "block";
 

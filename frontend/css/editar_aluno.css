@@ -39,6 +39,9 @@ input[type="submit"], .cancel-button {
     border-radius: 4px;
     cursor: pointer;
     margin-top: 10px;
+    font-size: 12pt;
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
 input[type="submit"]:hover, .cancel-button:hover {
@@ -49,6 +52,7 @@ input[type="submit"]:hover, .cancel-button:hover {
     background-color: #cc0000; /* Cancel button color */
     text-align: center;
     display: inline-block;
+    text-decoration: none;
 }
 
 .selectFiscal {

@@ -1,6 +1,9 @@
 <?php
 // Arquivo: get_faculdades.php
-
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 // Include your database connection
 require '../sistemas/config.php';
 

@@ -75,6 +75,8 @@ body { /* Adicione estilos ao body */
     text-decoration: underline;
 }
 
+
+
 @media (max-width: 768px) {
     .container {
         width: 90%; /* Largura máxima em telas pequenas */
