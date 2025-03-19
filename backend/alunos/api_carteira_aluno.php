@@ -49,6 +49,7 @@ try {
                 fc.placa,
                 fc.destino,
                 a.foto,
+                a.turno,
                 a.status AS ativo
             FROM alunos a
             LEFT JOIN faculdades f ON a.id_faculdade = f.id
@@ -69,8 +70,11 @@ try {
         if (!empty($aluno["foto"])) {
             $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
             $host = $_SERVER['HTTP_HOST'];
-            $fotoPath = "/sistema_dashboard/backend/alunos/uploads/";
-            $aluno["foto"] = $protocol . "://" . $host . $fotoPath . $aluno["foto"];
+            $fotoPath = "/sistema_dashboard/backend/alunos/uploads/fotoAluno/";
+            
+            // Verifica se o caminho já contém o diretório uploads/fotoAluno
+            $fileName = basename($aluno["foto"]);
+            $aluno["foto"] = $protocol . "://" . $host . $fotoPath . $fileName;
             
             error_log("URL da foto gerada: " . $aluno["foto"]);
         }

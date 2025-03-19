@@ -19,6 +19,7 @@ $result = $conn->query($sql);
     <title>Dashboard - Faculdades</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         .sidebar {
             height: 100vh;
@@ -133,7 +134,9 @@ $result = $conn->query($sql);
         </div>
 
         <div class="criar-fiscal mb-3">
-            <a href="cadastrar_faculdade.php" class="btn btn-primary">Adicionar Nova Faculdade</a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCadastrarFaculdade">
+                Adicionar Nova Faculdade
+            </button>
         </div>
 
         <div class="table-responsive">
@@ -157,7 +160,7 @@ $result = $conn->query($sql);
                             echo "<td>" . $row["cidade"] . "</td>";
                             echo "<td>" . $row["tipo"] . "</td>";
                             echo "<td>
-                                <a href='editar_faculdade.php?id=" . $row["id"] . "' class='btn btn-primary btn-sm'>Editar</a>
+                                <button onclick='abrirModalEditarFaculdade(" . $row["id"] . ", \"" . htmlspecialchars($row["nome"]) . "\", \"" . htmlspecialchars($row["sigla"]) . "\", \"" . htmlspecialchars($row["cidade"]) . "\", \"" . htmlspecialchars($row["tipo"]) . "\")' class='btn btn-primary btn-sm'>Editar</button>
                                 <button class='btn btn-danger btn-sm' onclick='excluirFaculdade(" . $row["id"] . ")'>Excluir</button>
                             </td>";
                             echo "</tr>";
@@ -172,6 +175,91 @@ $result = $conn->query($sql);
 
         <!-- Paginação -->
         <div id="pagination" class="pagination d-flex justify-content-center"></div>
+    </div>
+
+    <!-- Modal de Cadastro de Faculdade -->
+    <div class="modal fade" id="modalCadastrarFaculdade" tabindex="-1" aria-labelledby="modalCadastrarFaculdadeLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCadastrarFaculdadeLabel">Cadastrar Nova Faculdade</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="cadastroMessage" class="alert d-none"></div> <!-- Div para mensagens -->
+                    <form method="post" id="formCadastrarFaculdade">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome:</label>
+                            <input type="text" class="form-control" name="nome" id="nome" placeholder="Nome da faculdade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sigla" class="form-label">Sigla:</label>
+                            <input type="text" class="form-control" name="sigla" id="sigla" placeholder="Sigla da faculdade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cidade" class="form-label">Cidade:</label>
+                            <input type="text" class="form-control" name="cidade" id="cidade" placeholder="Cidade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tipo" class="form-label">Tipo:</label>
+                            <select class="form-control" name="tipo" id="tipo" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="Pública">Pública</option>
+                                <option value="Privada">Privada</option>
+                                <option value="Estadual">Estadual</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Cadastrar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Faculdade -->
+    <div class="modal fade" id="modalEditarFaculdade" tabindex="-1" aria-labelledby="modalEditarFaculdadeLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarFaculdadeLabel">Editar Faculdade</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="editMessage" class="alert d-none"></div> <!-- Div para mensagens de edição -->
+                    <form method="post" id="formEditarFaculdade">
+                        <input type="hidden" id="edit_id" name="id">
+                        <div class="mb-3">
+                            <label for="edit_nome" class="form-label">Nome:</label>
+                            <input type="text" class="form-control" name="nome" id="edit_nome" placeholder="Nome da faculdade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_sigla" class="form-label">Sigla:</label>
+                            <input type="text" class="form-control" name="sigla" id="edit_sigla" placeholder="Sigla da faculdade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_cidade" class="form-label">Cidade:</label>
+                            <input type="text" class="form-control" name="cidade" id="edit_cidade" placeholder="Cidade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_tipo" class="form-label">Tipo:</label>
+                            <select class="form-control" name="tipo" id="edit_tipo" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="Pública">Pública</option>
+                                <option value="Privada">Privada</option>
+                                <option value="Estadual">Estadual</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -337,14 +425,19 @@ $result = $conn->query($sql);
             updateTable(filteredData);
         }
 
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('.search-bar').addEventListener('input', searchTable);
-            document.querySelector('.ordenar-select').addEventListener('change', (e) => sortTable(e.target.value));
-            document.querySelector('.selectPag').addEventListener('change', (e) => changeRowsPerPage(e.target.value));
-            
-            initializeTable();
-        });
+        // Função para abrir o modal de edição
+        function abrirModalEditarFaculdade(id, nome, sigla, cidade, tipo) {
+            document.getElementById("edit_id").value = id;
+            document.getElementById("edit_nome").value = nome;
+            document.getElementById("edit_sigla").value = sigla;
+            document.getElementById("edit_cidade").value = cidade;
+            document.getElementById("edit_tipo").value = tipo;
+
+            var editModal = new bootstrap.Modal(document.getElementById('modalEditarFaculdade'), {
+                keyboard: false
+            });
+            editModal.show();
+        }
 
         function excluirFaculdade(id) {
             if (confirm("Tem certeza que deseja excluir esta faculdade?")) {
@@ -366,6 +459,83 @@ $result = $conn->query($sql);
         function logout() {
             window.location.href = "http://localhost/sistema_dashboard/frontend/admin/login.php";
         }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.search-bar').addEventListener('input', searchTable);
+            document.querySelector('.ordenar-select').addEventListener('change', (e) => sortTable(e.target.value));
+            document.querySelector('.selectPag').addEventListener('change', (e) => changeRowsPerPage(e.target.value));
+            
+            initializeTable();
+            
+            // Manipulador para o formulário de cadastro
+            $("#formCadastrarFaculdade").submit(function(event) {
+                event.preventDefault();
+                
+                $.ajax({
+                    url: "../../backend/faculdades/cadastrar_faculdades.php",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(response) {
+                        let messageDiv = $("#cadastroMessage");
+                        messageDiv.removeClass("d-none").addClass(response.status === "success" ? "alert-success" : "alert-danger");
+                        messageDiv.text(response.message);
+                        
+                        if (response.status === "success") {
+                            // Recarregar a página após 2 segundos para mostrar as alterações
+                            setTimeout(function() {
+                                location.reload();
+                            }, 2000);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Erro ao enviar o formulário de cadastro.");
+                        console.log("Status: " + status);
+                        console.log("Erro: " + error);
+                        console.log("Resposta: " + xhr.responseText);
+                        
+                        let messageDiv = $("#cadastroMessage");
+                        messageDiv.removeClass("d-none").addClass("alert-danger");
+                        messageDiv.text("Erro ao processar a solicitação. Tente novamente.");
+                    }
+                });
+            });
+            
+            // Manipulador para o formulário de edição
+            $("#formEditarFaculdade").submit(function(event) {
+                event.preventDefault();
+                
+                $.ajax({
+                    url: "../../backend/faculdades/editar_faculdades.php",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(response) {
+                        let messageDiv = $("#editMessage");
+                        messageDiv.removeClass("d-none").addClass(response.status === "success" ? "alert-success" : "alert-danger");
+                        messageDiv.text(response.message);
+                        
+                        if (response.status === "success") {
+                            // Recarregar a página após 2 segundos para mostrar as alterações
+                            setTimeout(function() {
+                                location.reload();
+                            }, 2000);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Erro ao enviar o formulário de edição.");
+                        console.log("Status: " + status);
+                        console.log("Erro: " + error);
+                        console.log("Resposta: " + xhr.responseText);
+                        
+                        let messageDiv = $("#editMessage");
+                        messageDiv.removeClass("d-none").addClass("alert-danger");
+                        messageDiv.text("Erro ao processar a solicitação. Tente novamente.");
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

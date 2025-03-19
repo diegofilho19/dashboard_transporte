@@ -13,11 +13,13 @@ $sql = "SELECT
     a.data_insercao,
     a.status,
     a.foto,
+    a.turno,
+    a.compMatricula,
     af.id_fiscal,
     fc.nome AS nome_motorista,  -- Nome do motorista
     fc.nome_carro,  -- Nome do carro
     fc.placa  -- Placa do carro
-FROM
+FROM   
     alunos a
 LEFT JOIN
     alunos_fiscais af ON a.id = af.id_aluno
@@ -48,188 +50,7 @@ function formatarData($data)
     <title>Dashboard - Alunos Cadastrados</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        .sidebar {
-            height: 100vh;
-            width: 200px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #343a40;
-            padding-top: 20px;
-        }
-
-        .sidebar .logo {
-            text-align: center;
-            color: white;
-            margin-bottom: 20px;
-        }
-
-        .sidebar .menu-items {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-
-        .sidebar .menu-item:hover {
-            background-color: #495057;
-        }
-
-        .sidebar .menu-item a {
-            color: white;
-            text-decoration: none;
-        }
-
-        .sidebar .menu-item i {
-            font-size: 1.2rem;
-            color: white;
-        }
-
-        .main-content {
-            margin-left: 200px;
-            padding: 20px;
-        }
-
-        .header {
-            margin-bottom: 20px;
-        }
-
-        .table-responsive {
-            margin-top: 20px;
-        }
-
-        .pagination {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .pagination button {
-            margin: 0 5px;
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            background-color: #f8f9fa;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .pagination button:hover {
-            background-color: #0056b3;
-            color: white;
-            border-color: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .pagination button.active {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-
-        .status-ativo {
-            color: green;
-            font-weight: bold;
-        }
-
-        .status-inativo {
-            color: red;
-            font-weight: bold;
-        }
-
-        /* Estilos do Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 600px;
-            border-radius: 8px;
-            position: relative;
-        }
-
-        .close {
-            position: absolute;
-            right: 10px;
-            top: 5px;
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: black;
-        }
-
-        .foto-perfil {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .foto-perfil img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #007bff;
-        }
-
-        .info-aluno {
-            margin-top: 20px;
-        }
-
-        .info-aluno p {
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        .acoes-container {
-    display: flex;
-    justify-content: flex-start; /* Alinha os botões à esquerda */
-    gap: 5px; /* Espaçamento entre os botões */
-}
-
-.acoes-container .btn {
-    padding: 5px 10px; /* Ajuste o espaçamento interno dos botões */
-    border-radius: 5px; /* Bordas arredondadas */
-}
-
-.btn-visualizar {
-    background-color: gray;
-    color: white;
-}
-
-.btn-editar {
-    background-color: blue;
-    color: white;
-}
-
-.btn-excluir {
-    background-color: red;
-    color: white;
-}
-        
-    </style>
+    <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 
 <body>
@@ -262,6 +83,7 @@ function formatarData($data)
         <div class="header">
             <h1>ALUNOS CADASTRADOS</h1>
             <div class="controls d-flex gap-2">
+                <button class="btn btn-success" onclick="abrirModalCadastro()">Novo Aluno</button>
                 <input type="text" class="form-control search-bar" placeholder="Pesquisar...">
                 <select class="form-select ordenar-select" aria-label="Ordenar alunos">
                     <option value="#">Filtrar</option>
@@ -314,14 +136,13 @@ function formatarData($data)
                             echo "<td>" . $motorista_info . ", " . $carro_info . "</td>";
 
                             echo "<td>
-                                <div class='acoes-container'>
-                                    <button onclick='abrirModal(\"" . $row["nome_completo"] . "\", \"" . $row["cpf"] . "\", \"" . $row['numero_tel'] . "\", \"" . $row["matricula"] . "\", \"" . $row["status"] . "\", \"" . $row["nome_faculdade"] .
-                                "\", \"" . $row["cidade"] . "\", \"" . $row["foto"] . "\", \"" . $row['nome_motorista'] . "\", \"" . $row['nome_carro'] . "\", \"" . $row['placa'] . "\")' class='btn btn-secondary btn-sm'>Visualizar</button>
-                                    <a href='../alunos/editar_alunos.php?cpf=" . $row["cpf"] . "' class='btn btn-primary btn-sm'>Editar</a>
-                                    <button class='btn btn-danger btn-sm' onclick='excluirAluno(\"" . $row["cpf"] . "\")'>Excluir</button>
-                                </div>
-                            </td>";
-
+            <div class='acoes-container'>
+                <button onclick='abrirModal(\"" . $row["nome_completo"] . "\", \"" . $row["cpf"] . "\", \"" . $row['numero_tel'] . "\", \"" . $row["matricula"] . "\", \"" . $row["turno"] . "\", \"" . $row["status"] . "\", \"" . $row["nome_faculdade"] .
+                                "\", \"" . $row["cidade"] . "\", \"" . $row["foto"] . "\", \"" . $row['nome_motorista'] . "\", \"" . $row['nome_carro'] . "\", \"" . $row['placa'] . "\", \"" . $row["compMatricula"] . "\")' class='btn btn-secondary btn-sm'>Visualizar</button>
+                <button onclick='editarAluno(\"" . $row["cpf"] . "\", \"" . $row["nome_completo"] . "\", \"" . $row["matricula"] . "\", \"" . $row["numero_tel"] . "\", \"" . $row["status"] . "\", \"" . $row["id_fiscal"] . "\")' class='btn btn-primary btn-sm'>Editar</button>
+                <button class='btn btn-danger btn-sm' onclick='excluirAluno(\"" . $row["cpf"] . "\")'>Excluir</button>
+            </div>
+        </td>";
                             echo "</tr>";
                         }
                     } else {
@@ -348,12 +169,133 @@ function formatarData($data)
                 <p id="cpfCarteira"></p>
                 <p id="numeroCarteira"></p>
                 <p id="matriculaCarteira"></p>
+                <p id="turnoCarteira"></p>
                 <p id="statusCarteira"></p>
                 <p id="faculdadeCarteira"></p>
                 <p id="cidadeCarteira"></p>
                 <p id="motoristaCarteira"></p>
                 <p id="carroCarteira"></p>
+                <div id="compMatriculaCarteira">
+                    <p>Comprovante de Matrícula: <a href="#" id="linkComprovante" target="_blank">Visualizar</a></p>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro de Aluno -->
+    <div id="modalCadastro" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModalCadastro()">&times;</span>
+            <h2 class="text-center mb-4">Cadastrar Novo Aluno</h2>
+            <form id="formCadastroAluno" enctype="multipart/form-data">
+                <div id="mensagem-cadastro" class="alert" style="display: none; margin-bottom: 15px;"></div>
+                <div class="mb-3">
+                    <label for="nome_completo" class="form-label">Nome Completo:</label>
+                    <input type="text" class="form-control" id="nome_completo" name="nome_completo" required>
+                </div>
+                <div class="mb-3">
+                    <label for="cpf" class="form-label">CPF:</label>
+                    <input type="text" class="form-control" id="cpf" name="cpf" maxlength="14" required>
+                </div>
+                <div class="mb-3">
+                    <label for="matricula" class="form-label">Matrícula:</label>
+                    <input type="text" class="form-control" id="matricula" name="matricula" required>
+                </div>
+                <div class="mb-3">
+                    <label for="numero_tel" class="form-label">Número de Telefone:</label>
+                    <input type="text" class="form-control" id="numero_tel" name="numero_tel" maxlength="15" required>
+                </div>
+                <div class="mb-3">
+                    <label for="senha" class="form-label">Senha:</label>
+                    <input type="password" class="form-control" id="senha" name="senha" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="turno" class="form-label">Turno:</label>
+                    <select name="turno" id="turno" class="form-select" required>
+                        <option value="">Selecione um turno</option>
+                        <option value="Matutino">Matutino</option>
+                        <option value="Vespertino">Vespertino</option>
+                        <option value="Noturno">Noturno</option>
+                        <option value="Integral">Integral</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_faculdade" class="form-label">Faculdade</label>
+                    <select class="form-select" id="id_faculdade" name="id_faculdade" required>
+                        <option value="">Selecione uma faculdade:</option>
+                        <?php
+                        $faculdades_sql = "SELECT id, nome, cidade FROM faculdades ORDER BY nome";
+                        $faculdades_result = $conn->query($faculdades_sql);
+                        while ($faculdade = $faculdades_result->fetch_assoc()) {
+                            echo "<option value='" . $faculdade['id'] . "'>" . $faculdade['nome'] . " - " . $faculdade['cidade'] . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="curso" class="form-label">Curso:</label>
+                    <input type="text" class="form-control" id="curso" name="curso" required>
+                </div>
+                <div class="mb-3">
+                    <label for="foto" class="form-label">Foto:</label>
+                    <input type="file" class="form-control" id="foto" name="foto">
+                </div>
+                <div class="mb-3">
+                    <label for="compMatricula" class="form-label">Comprovante de Matricula:</label>
+                    <input type="file" class="form-control" id="compMatricula" name="compMatricula" accept=".pdf, .jpg, .jpeg, .png">
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Aluno -->
+    <div id="modalEditar" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModalEditar()">&times;</span>
+            <h2 class="text-center mb-4">Editar Aluno</h2>
+            <form id="formEditarAluno">
+                <input type="hidden" id="edit_cpf" name="cpf">
+                <div class="mb-3">
+                    <label for="edit_nome_completo" class="form-label">Nome Completo</label>
+                    <input type="text" class="form-control" id="edit_nome_completo" name="nome_completo" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit_matricula" class="form-label">Matrícula</label>
+                    <input type="text" class="form-control" id="edit_matricula" name="matricula" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit_numero_tel" class="form-label">Número de Telefone</label>
+                    <input type="text" class="form-control" id="edit_numero_tel" name="numero_tel" maxlength="15" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit_status" class="form-label">Status</label>
+                    <select class="form-select" id="edit_status" name="status" required>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Inativo">Inativo</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="edit_id_fiscal" class="form-label">Motorista</label>
+                    <select class="form-select" id="edit_id_fiscal" name="id_fiscal" required>
+                        <option value="">Selecione um motorista</option>
+                        <?php
+                        $fiscais_sql = "SELECT id, nome, nome_carro, placa FROM fiscais ORDER BY nome";
+                        $fiscais_result = $conn->query($fiscais_sql);
+                        while ($fiscal = $fiscais_result->fetch_assoc()) {
+                            echo "<option value='" . $fiscal['id'] . "'>" . $fiscal['nome'] . " (" . $fiscal['nome_carro'] . " - " . $fiscal['placa'] . ")</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -560,11 +502,12 @@ function formatarData($data)
             document.querySelector('.selectPag').addEventListener('change', (e) => changeRowsPerPage(e.target.value));
         });
 
-        function abrirModal(nome, cpf, numero_tel, matricula, status, faculdade, cidade, foto, motorista, carro, placa) {
+        function abrirModal(nome, cpf, numero_tel, matricula, turno, status, faculdade, cidade, foto, motorista, carro, placa, compMatricula) {
             document.getElementById("nomeCarteira").textContent = "Nome: " + nome;
             document.getElementById("cpfCarteira").textContent = "CPF: " + cpf;
             document.getElementById("numeroCarteira").textContent = "Número: " + numero_tel;
             document.getElementById("matriculaCarteira").textContent = "Matrícula: " + matricula;
+            document.getElementById("turnoCarteira").textContent = "Turno: " + turno;
             document.getElementById("statusCarteira").textContent = "Status: " + status;
             document.getElementById("faculdadeCarteira").textContent = "Faculdade: " + faculdade;
             document.getElementById("cidadeCarteira").textContent = "Cidade: " + cidade;
@@ -575,7 +518,7 @@ function formatarData($data)
 
             const fotoPerfil = document.querySelector('.foto-perfil img');
             const nomeArquivo = foto.split('/').pop();
-            const caminhoCorreto = "../../backend/alunos/uploads/" + nomeArquivo;
+            const caminhoCorreto = "../../backend/alunos/uploads/fotoAluno/" + nomeArquivo;
 
             if (nomeArquivo && nomeArquivo.trim() !== "") {
                 fotoPerfil.setAttribute('src', caminhoCorreto);
@@ -587,6 +530,24 @@ function formatarData($data)
             } else {
                 fotoPerfil.setAttribute('src', '../imgs/default_profile.png');
                 fotoPerfil.setAttribute('alt', 'Foto de perfil não disponível');
+            }
+
+            // Configurar o link do comprovante de matrícula
+            const linkComprovante = document.getElementById("linkComprovante");
+            if (compMatricula && compMatricula.trim() !== "") {
+                // Verifica se o caminho já é completo ou precisa ser construído
+                let caminhoComprovante;
+                if (compMatricula.includes('/uploads/comprovantes/')) {
+                    caminhoComprovante = "../../backend" + compMatricula.substring(compMatricula.indexOf('/alunos/'));
+                } else {
+                    caminhoComprovante = "../../backend/alunos/uploads/comprovantes/" + compMatricula.split('/').pop();
+                }
+                
+                linkComprovante.href = caminhoComprovante;
+                linkComprovante.style.display = "inline";
+                document.getElementById("compMatriculaCarteira").style.display = "block";
+            } else {
+                document.getElementById("compMatriculaCarteira").style.display = "none";
             }
 
             document.getElementById("modalCarteira").style.display = "block"; // Mostra o modal
@@ -618,6 +579,210 @@ function formatarData($data)
                 });
             }
         }
+
+        // Funções para o modal de cadastro
+        function abrirModalCadastro() {
+            document.getElementById("modalCadastro").style.display = "block";
+        }
+
+        function fecharModalCadastro() {
+            document.getElementById("modalCadastro").style.display = "none";
+            document.getElementById("formCadastroAluno").reset();
+        }
+
+        // Envio do formulário de cadastro
+        $(document).ready(function() {
+            // Máscara para CPF
+            $("#cpf").on("input", function() {
+                var value = $(this).val().replace(/\D/g, '');
+                if (value.length > 9) {
+                    value = value.replace(/^(\d{3})(\d{3})(\d{3})/, "$1.$2.$3-");
+                } else if (value.length > 6) {
+                    value = value.replace(/^(\d{3})(\d{3})/, "$1.$2.");
+                } else if (value.length > 3) {
+                    value = value.replace(/^(\d{3})/, "$1.");
+                }
+                $(this).val(value);
+            });
+
+            // Máscara para Telefone
+            $("#numero_tel").on("input", function() {
+                var value = $(this).val().replace(/\D/g, '');
+                if (value.length > 10) {
+                    value = value.replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+                } else if (value.length > 6) {
+                    value = value.replace(/^(\d{2})(\d{4})/, "($1) $2-");
+                } else if (value.length > 2) {
+                    value = value.replace(/^(\d{2})/, "($1) ");
+                }
+                $(this).val(value);
+            });
+
+            // Também adicionar máscaras para o modal de edição
+            $("#edit_numero_tel").on("input", function() {
+                var value = $(this).val().replace(/\D/g, '');
+                if (value.length > 10) {
+                    value = value.replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+                } else if (value.length > 6) {
+                    value = value.replace(/^(\d{2})(\d{4})/, "($1) $2-");
+                } else if (value.length > 2) {
+                    value = value.replace(/^(\d{2})/, "($1) ");
+                }
+                $(this).val(value);
+            });
+        });
+
+        $("#formCadastroAluno").submit(function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+
+            // Verifique se o arquivo foi selecionado
+            var compMatricula = $('#compMatricula')[0].files[0];
+            if (compMatricula) {
+                formData.append('compMatricula', compMatricula);
+                console.log("Comprovante de matrícula anexado:", compMatricula.name);
+            } else {
+                console.log("Nenhum comprovante de matrícula anexado");
+            }
+
+            var mensagemElement = document.getElementById("mensagem-cadastro");
+            mensagemElement.style.display = "none";
+
+            $.ajax({
+                url: '../../backend/alunos/api_cadastro.php',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    // Verifica se a resposta já é um objeto
+                    var res;
+                    if (typeof response === 'string') {
+                        try {
+                            res = JSON.parse(response);
+                        } catch (e) {
+                            // Se não puder analisar como JSON, exibe uma mensagem genérica
+                            console.error("Erro ao processar resposta:", response);
+                            mensagemElement.innerHTML = "Erro ao processar o cadastro. Por favor, tente novamente.";
+                            mensagemElement.className = "alert alert-danger";
+                            mensagemElement.style.display = "block";
+                            return;
+                        }
+                    } else {
+                        res = response;
+                    }
+                    
+                    if (res && res.status === 'success') {
+                        mensagemElement.innerHTML = res.message;
+                        mensagemElement.className = "alert alert-success";
+                        mensagemElement.style.display = "block";
+
+                        // Limpar formulário após 2 segundos e recarregar a página
+                        setTimeout(function() {
+                            fecharModalCadastro();
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        mensagemElement.innerHTML = "Erro ao cadastrar: " + (res && res.message ? res.message : "Erro desconhecido");
+                        mensagemElement.className = "alert alert-danger";
+                        mensagemElement.style.display = "block";
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Erro AJAX:", xhr.responseText);
+                    try {
+                        // Tenta analisar a resposta de erro como JSON
+                        var errorResponse = JSON.parse(xhr.responseText);
+                        if (errorResponse && errorResponse.message) {
+                            mensagemElement.innerHTML = "Erro ao processar o cadastro: " + errorResponse.message;
+                        } else {
+                            mensagemElement.innerHTML = "Erro ao processar o cadastro: " + error;
+                        }
+                    } catch (e) {
+                        // Se não puder analisar como JSON, exibe uma mensagem genérica
+                        console.error("Erro ao processar resposta:", xhr.responseText);
+                        mensagemElement.innerHTML = "Erro ao processar o cadastro. Por favor, tente novamente.";
+                    }
+                    mensagemElement.className = "alert alert-danger";
+                    mensagemElement.style.display = "block";
+                }
+            });
+        });
+
+        // Função para editar aluno
+        function editarAluno(cpf, nome, matricula, numero_tel, status, id_fiscal) {
+            // Preenche o formulário de edição
+            document.getElementById("edit_cpf").value = cpf;
+            document.getElementById("edit_nome_completo").value = nome;
+            document.getElementById("edit_matricula").value = matricula;
+            document.getElementById("edit_numero_tel").value = numero_tel;
+            document.getElementById("edit_status").value = status;
+
+            // Se o id_fiscal for válido, seleciona o motorista
+            if (id_fiscal) {
+                document.getElementById("edit_id_fiscal").value = id_fiscal;
+            }
+
+            // Abre o modal
+            document.getElementById("modalEditar").style.display = "block";
+        }
+
+        function fecharModalEditar() {
+            document.getElementById("modalEditar").style.display = "none";
+        }
+
+        // Atualizar cidade ao selecionar faculdade
+        $(document).ready(function() {
+            $("#id_faculdade").change(function() {
+                var faculdadeId = $(this).val();
+                if (faculdadeId) {
+                    // Encontra o elemento option da faculdade selecionada
+                    var faculdadeOption = $(this).find("option:selected");
+
+                    // Obtém a cidade dessa faculdade
+                    var cidadeTexto = faculdadeOption.text().split(" - ")[1];
+
+                    // Procura a opção da cidade no select de cidades que contém esse texto
+                    var cidadeOption = $("#id_cidade option").filter(function() {
+                        return $(this).text() === cidadeTexto;
+                    });
+
+                    // Se encontrou, seleciona essa cidade
+                    if (cidadeOption.length) {
+                        $("#id_cidade").val(cidadeOption.val());
+                    }
+                }
+            });
+        });
+
+        // Envio do formulário de edição
+        $(document).ready(function() {
+            $("#formEditarAluno").submit(function(e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: '../../backend/alunos/processar_edicao_aluno.php',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        var res = JSON.parse(response);
+                        if (res.status === 'success') {
+                            alert(res.message);
+                            fecharModalEditar();
+                            location.reload();
+                        } else {
+                            alert("Erro ao editar: " + res.message);
+                        }
+                    },
+                    error: function() {
+                        alert("Erro ao processar a edição!");
+                    }
+                });
+            });
+        });
     </script>
 </body>
 

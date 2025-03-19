@@ -19,6 +19,7 @@ $result = $conn->query($sql);
     <title>Dashboard - Motoristas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .sidebar {
@@ -121,7 +122,65 @@ $result = $conn->query($sql);
         </div>
 
         <div class="criar-fiscal mb-3">
-            <a href="cadastrar_fiscal.php" class="btn btn-primary">Cadastrar novo Motorista</a>
+            <!-- Botao do modal de cadastrado do motorista -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCadastrarFiscal">
+                Cadastrar novo Motorista
+            </button>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="modalCadastrarFiscal" tabindex="-1" aria-labelledby="modalCadastrarFiscalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalCadastrarFiscalLabel">Cadastrar Novo Motorista</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="message" class="alert d-none"></div> <!-- Div para mensagens -->
+                        <form method="post" id="formFiscal">
+                            <div class="mb-3">
+                                <label for="nome" class="form-label">Nome:</label>
+                                <input type="text" class="form-control" name="nome" id="nome" placeholder="Nome completo" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cnh" class="form-label">CNH:</label>
+                                <input type="text" class="form-control" name="cnh" id="cnh" placeholder="Número da CNH" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="nome_carro" class="form-label">Veículo:</label>
+                                <input type="text" class="form-control" name="nome_carro" id="nome_carro" placeholder="Modelo do veículo" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="placa" class="form-label">Placa:</label>
+                                <input type="text" class="form-control" name="placa" id="placa" placeholder="Placa do veículo" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="destino" class="form-label">Destino:</label>
+                                <input type="text" class="form-control" name="destino" id="destino" placeholder="Destino" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="numero" class="form-label">Telefone:</label>
+                                <input type="tel" class="form-control" name="numero" id="numero" placeholder="Número de telefone" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="turno" class="form-label">Turno:</label>
+                                <select name="turno" id="turno" class="form-select" required>
+                                    <option value="">Selecione um turno</option>
+                                    <option value="Matutino">Matutino</option>
+                                    <option value="Vespertino">Vespertino</option>
+                                    <option value="Noturno">Noturno</option>
+                                    <option value="Integral">Integral</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-primary">Registrar</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="table-responsive">
@@ -147,9 +206,9 @@ $result = $conn->query($sql);
                             echo "<td>" . $row["placa"] . "</td>";
                             echo "<td>" . $row["destino"] . "</td>";
                             echo "<td>
-                                <button onclick='abrirModalFiscal(\"" . htmlspecialchars($row["nome"]) . "\", \"" . htmlspecialchars($row["cnh"]) . "\", \"" . htmlspecialchars($row["nome_carro"]) . "\", \"" . htmlspecialchars($row["placa"]) . "\", \"" . htmlspecialchars($row["destino"]) . "\", \"" . htmlspecialchars($row["numero"]) . "\")' class='btn btn-secondary btn-sm'>Visualizar</button>
-                                <a href='editar_fiscal.php?id=" . $row["id"] . "' class='btn btn-primary btn-sm'>Editar</a>
-                                <button class='btn btn-danger btn-sm' onclick='excluirFiscal(" . $row["id"] . ")'>Excluir</button>
+                            <button onclick='abrirModalFiscal(\"" . htmlspecialchars($row["nome"]) . "\", \"" . htmlspecialchars($row["cnh"]) . "\", \"" . htmlspecialchars($row["nome_carro"]) . "\", \"" . htmlspecialchars($row["placa"]) . "\", \"" . htmlspecialchars($row["destino"]) . "\", \"" . htmlspecialchars($row["numero"]) . "\", \"" . $row["turno"]. "\")' class='btn btn-secondary btn-sm'>Visualizar</button>
+                            <button onclick='abrirModalEditarFiscal(" . $row["id"] . ", \"" . htmlspecialchars($row["nome"]) . "\", \"" . htmlspecialchars($row["cnh"]) . "\", \"" . htmlspecialchars($row["nome_carro"]) . "\", \"" . htmlspecialchars($row["placa"]) . "\", \"" . htmlspecialchars($row["destino"]) . "\", \"" . htmlspecialchars($row["numero"]) ."\")' class='btn btn-primary btn-sm'>Editar</button>
+                            <button class='btn btn-danger btn-sm' onclick='excluirFiscal(" . $row["id"] . ")'>Excluir</button>
                             </td>";
                             echo "</tr>";
                         }
@@ -160,7 +219,7 @@ $result = $conn->query($sql);
                 </tbody>
             </table>
         </div>
-
+        <!--Modal de Fiscal, para visualizar as informaçoes-->
         <div class="modal fade" id="modalFiscal" tabindex="-1" aria-labelledby="modalFiscalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -175,10 +234,58 @@ $result = $conn->query($sql);
                         <p id="carroFiscal">Carro: </p>
                         <p id="placaFiscal">Placa: </p>
                         <p id="destinoFiscal">Destino: </p>
+                        <p id="turnoFiscal">Turno:</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar um fiscal -->
+
+    <div class="modal fade" id="modalEditarFiscal" tabindex="-1" aria-labelledby="modalEditarFiscalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarFiscalLabel">Editar Motorista</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="editMessage" class="alert d-none"></div> <!-- Div para mensagens de edição -->
+                    <form method="post" id="formEditarFiscal">
+                        <input type="hidden" id="edit_id" name="id">
+                        <div class="mb-3">
+                            <label for="edit_nome" class="form-label">Nome:</label>
+                            <input type="text" class="form-control" name="nome" id="edit_nome" placeholder="Nome completo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_cnh" class="form-label">CNH:</label>
+                            <input type="text" class="form-control" name="cnh" id="edit_cnh" placeholder="Número da CNH" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_nome_carro" class="form-label">Veículo:</label>
+                            <input type="text" class="form-control" name="nome_carro" id="edit_nome_carro" placeholder="Modelo do veículo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_placa" class="form-label">Placa:</label>
+                            <input type="text" class="form-control" name="placa" id="edit_placa" placeholder="Placa do veículo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_destino" class="form-label">Destino:</label>
+                            <input type="text" class="form-control" name="destino" id="edit_destino" placeholder="Destino" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_numero" class="form-label">Telefone:</label>
+                            <input type="tel" class="form-control" name="numero" id="edit_numero" placeholder="Número de telefone" required>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -205,13 +312,15 @@ $result = $conn->query($sql);
             }
         }
 
-        function abrirModalFiscal(nome, cnh, nome_carro, placa, destino, numero) {
+        function abrirModalFiscal(nome, cnh, nome_carro, placa, destino, numero, turno) {
             document.getElementById("nomeFiscal").textContent = "Nome: " + nome;
             document.getElementById("cnhFiscal").textContent = "CNH: " + cnh;
             document.getElementById("numeroFiscal").textContent = "Número: " + numero;
             document.getElementById("carroFiscal").textContent = "Carro: " + nome_carro;
             document.getElementById("placaFiscal").textContent = "Placa: " + placa;
             document.getElementById("destinoFiscal").textContent = "Destino: " + destino;
+            document.getElementById("turnoFiscal").textContent = "Turno: " + turno;
+
 
             var myModal = new bootstrap.Modal(document.getElementById('modalFiscal'), {
                 keyboard: false
@@ -223,7 +332,28 @@ $result = $conn->query($sql);
             window.location.href = "http://localhost/sistema_dashboard/frontend/admin/login.php";
         }
 
+        function abrirModalEditarFiscal(id, nome, cnh, nome_carro, placa, destino, numero) {
+            document.getElementById("edit_id").value = id;
+            document.getElementById("edit_nome").value = nome;
+            document.getElementById("edit_cnh").value = cnh;
+            document.getElementById("edit_nome_carro").value = nome_carro;
+            document.getElementById("edit_placa").value = placa;
+            document.getElementById("edit_destino").value = destino;
+            document.getElementById("edit_numero").value = numero;
+
+            var editModal = new bootstrap.Modal(document.getElementById('modalEditarFiscal'), {
+                keyboard: false
+            });
+            editModal.show();
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializa a máscara no campo de telefone
+            $('#numero').mask('(00) 00000-0000');
+
+            // Inicializa a máscara no campo de telefone de edição
+            $('#edit_numero').mask('(00) 00000-0000');
+
             const searchBar = document.querySelector('.search-bar');
             const ordenarSelect = document.querySelector('.ordenar-select');
             const table = document.getElementById('fiscaisTable');
@@ -268,6 +398,57 @@ $result = $conn->query($sql);
                 rowsArray.forEach(function(row) {
                     table.getElementsByTagName('tbody')[0].appendChild(row);
                 });
+            });
+
+            // Manipulador para o formulário de edição
+            $("#formEditarFiscal").submit(function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    url: "../../backend/fiscais/processar_edicao_fiscal.php",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(response) {
+                        let messageDiv = $("#editMessage");
+                        messageDiv.removeClass("d-none").addClass(response.status === "success" ? "alert-success" : "alert-danger");
+                        messageDiv.text(response.message);
+
+                        if (response.status === "success") {
+                            // Recarregar a página após 2 segundos para mostrar as alterações
+                            setTimeout(function() {
+                                location.reload();
+                            }, 2000);
+                        }
+                    },
+                    error: function(error) {
+                        console.log("Erro ao enviar o formulário de edição.");
+                        console.error(error);
+
+                        let messageDiv = $("#editMessage");
+                        messageDiv.removeClass("d-none").addClass("alert-danger");
+                        messageDiv.text("Erro ao processar a solicitação. Tente novamente.");
+                    }
+                });
+            });
+        });
+        $("#formFiscal").submit(function(event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: "../../backend/fiscais/cadastrar_fiscal.php",
+                type: "POST",
+                data: $(this).serialize(),
+                dataType: "json",
+                success: function(response) {
+                    let messageDiv = $("#message");
+                    messageDiv.removeClass("d-none").addClass(response.status === "success" ? "alert-success" : "alert-danger");
+                    messageDiv.text(response.message);
+                },
+                error: function(error) {
+                    console.log("Erro ao enviar o formulário.");
+                    console.error(error);
+                }
             });
         });
     </script>

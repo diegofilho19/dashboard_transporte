@@ -15,17 +15,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $placa = $_POST['placa'];
     $destino = $_POST['destino'];
     $numero = $_POST['numero']; // Altere para $numero
+    $turno = $_POST['turno'];
 
     // Insira os dados no banco de dados
-    $sql = "INSERT INTO fiscais (nome, cnh, nome_carro, placa, destino, numero) VALUES (?, ?, ?, ?, ?, ?)"; // Altere para numero
+    $sql = "INSERT INTO fiscais (nome, cnh, nome_carro, placa, destino, numero, turno) VALUES (?, ?, ?, ?, ?, ?, ?)"; // Altere para numero
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssss", $nome, $cnh, $nome_carro, $placa, $destino, $numero); // Altere para $numero
+    $stmt->bind_param("sssssss", $nome, $cnh, $nome_carro, $placa, $destino, $numero, $turno); // Altere para $numero
 
     if ($stmt->execute()) {
-        echo json_encode(["status" => "success", "message" => "Fiscal cadastrado com sucesso!"]);
+        echo json_encode(["status" => "success", "message" => "Motorista cadastrado com sucesso!"]);
         exit;
     } else {
-        echo json_encode(["status" => "error", "message" => "Erro ao cadastrar fiscal!"]);
+        echo json_encode(["status" => "error", "message" => "Erro ao cadastrar motorista!"]);
     }
 
     $stmt->close();
